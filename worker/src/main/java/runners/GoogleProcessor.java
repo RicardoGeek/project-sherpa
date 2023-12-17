@@ -69,17 +69,23 @@ public class GoogleProcessor extends Thread {
             String newUrl = driver.getCurrentUrl();
 
             if (!prevUrl.equals(newUrl)) {
-                log.info("Sponsored page! engaging");
+                log.info("sponsored page: " + driver.getCurrentUrl());
                 pageEngage(driver);
             } else {
                 prevUrl = driver.getCurrentUrl();
+                log.info("Did not hit sponsored page: " + prevUrl);
 
                 locateIframesAndClick(driver);
 
                 newUrl = driver.getCurrentUrl();
+
                 if(prevUrl.equals(newUrl)) {
                     pageEngage(driver);
                     locateIframesAndClick(driver); // try one last time on some other page
+                    log.info("last resort page: " + driver.getCurrentUrl());
+                    pageEngage(driver); // engage with sponsored page (hopefully)
+                } else {
+                    log.info("sponsored page: " + driver.getCurrentUrl());
                     pageEngage(driver); // engage with sponsored page (hopefully)
                 }
             }
@@ -172,7 +178,7 @@ public class GoogleProcessor extends Thread {
             int clickDelay = Utils.getRandomNumber(100, 150);
             Thread.sleep(clickDelay);
 
-            log.info("Clicking link");
+            log.info("Clicking link: " + href);
             link.click();
             Thread.sleep(3000);
             break;
