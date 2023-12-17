@@ -38,6 +38,7 @@ public class TouchProcessor extends Thread {
 
             // Start again -.-"
             TouchProcessor p = new TouchProcessor();
+            p.setUrl(this.url);
             p.start();
         }
     }

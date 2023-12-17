@@ -14,9 +14,9 @@ import java.util.List;
 
 @Slf4j
 public class GoogleProcessor extends Thread {
-    private BrowserProvider browserProvider;
-    private ProxyProvider proxyProvider;
-    private Simulator simulator;
+    private final BrowserProvider browserProvider;
+    private final ProxyProvider proxyProvider;
+    private final Simulator simulator;
 
     // proxy configs for process
     private String proxyHost;

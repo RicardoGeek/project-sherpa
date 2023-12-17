@@ -6,7 +6,7 @@ public class Simulator {
     public void sendKeysWithDelay(WebElement input, String text) throws InterruptedException {
         for(int i =  0; i < text.length(); i++) {
             input.sendKeys(String.valueOf(text.charAt(i)));
-            Integer millisDelay = getRandomNumber(10, 200);
+            int millisDelay = getRandomNumber(10, 200);
             Thread.sleep(millisDelay);
         }
     }
