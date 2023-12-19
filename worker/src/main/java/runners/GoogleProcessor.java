@@ -118,7 +118,7 @@ public class GoogleProcessor extends Thread {
         ProxyDetails pd = pdd.getBest();
 
         GoogleProcessor googleProcessor = new GoogleProcessor();
-        googleProcessor.setHeadless(false);
+        googleProcessor.setHeadless(true);
         googleProcessor.setProxyHost(pd.getHost());
         googleProcessor.setProxyPort(pd.getPort());
         googleProcessor.setProxyUsername(pd.getUsername(), pd.getProvider());
