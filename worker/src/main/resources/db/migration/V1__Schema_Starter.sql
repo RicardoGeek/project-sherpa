@@ -1,6 +1,6 @@
 create table process_pool
 (
-    id          binary                 not null,
+    id          int                not null auto_increment,
     search_term text                   not null,
     domain      text                   not null,
     sink_date   datetime default NOW() not null,
@@ -10,7 +10,7 @@ create table process_pool
 
 create table proxies
 (
-    id       binary       not null,
+    id          int                not null auto_increment,
     host     varchar(150) not null,
     port     int          null,
     username varchar(150) null,

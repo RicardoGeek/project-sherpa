@@ -1,8 +1,14 @@
+import config.FlywayConfig;
+import org.flywaydb.core.Flyway;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import runners.GoogleProcessor;
 import runners.TouchProcessor;
 
+import java.sql.SQLException;
+
 public class Worker {
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        initializeFlyway();
         String type = args[0];
         System.out.println(type);
         switch (type) {
@@ -12,19 +18,18 @@ public class Worker {
                 touchProcessor.start();
                 break;
             case "2":
-                GoogleProcessor googleProcessor = new GoogleProcessor();
-                googleProcessor.setHeadless(true);
-                googleProcessor.setProxyHost("gw.dataimpulse.com");
-                googleProcessor.setProxyPort(1000);
-                googleProcessor.setProxyUsername("2b0367e87a0ad278eb1b");
-                googleProcessor.setProxyPassword("58c189303c5bee20");
-                googleProcessor.setSearchTerm("parabolic sar formula compasstrader");
-                googleProcessor.setTargetPage("compasstrader.com");
-                googleProcessor.start();
+                GoogleProcessor.spawn();
                 break;
             default:
                 System.out.println("wtf parameter");
                 break;
+        }
+    }
+
+    private static void initializeFlyway() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(FlywayConfig.class)) {
+            Flyway flyway = context.getBean(Flyway.class);
+            flyway.migrate();
         }
     }
 }

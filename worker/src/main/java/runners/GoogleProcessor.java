@@ -1,5 +1,9 @@
 package runners;
 
+import dao.ProcessPool;
+import dao.ProcessPoolDao;
+import dao.ProxyDetails;
+import dao.ProxyDetailsDao;
 import lombok.extern.slf4j.Slf4j;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import org.openqa.selenium.*;
@@ -9,6 +13,7 @@ import providers.ProxyProvider;
 import simulation.Simulator;
 import utils.Utils;
 
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
 
@@ -100,10 +105,28 @@ public class GoogleProcessor extends Thread {
             driver.quit();
             proxy.stop();
 
-            // Start again -.-"
-            GoogleProcessor p = new GoogleProcessor();
-            p.start();
+            spawn();
         }
+    }
+
+    public static void spawn() {
+        // get process
+        ProcessPoolDao processPoolDao = new ProcessPoolDao();
+        ProcessPool p = processPoolDao.getNext();
+        // get BEST proxy
+        ProxyDetailsDao pdd = new ProxyDetailsDao();
+        ProxyDetails pd = pdd.getBest();
+
+        GoogleProcessor googleProcessor = new GoogleProcessor();
+        googleProcessor.setHeadless(false);
+        googleProcessor.setProxyHost(pd.getHost());
+        googleProcessor.setProxyPort(pd.getPort());
+        googleProcessor.setProxyUsername(pd.getUsername(), pd.getProvider());
+        googleProcessor.setProxyPassword(pd.getPassword());
+        googleProcessor.setSearchTerm(p.getSearchTerm());
+        googleProcessor.setTargetPage(p.getDomain());
+        googleProcessor.start();
+        processPoolDao.sink(p.getId()); // put it at the end of the list
     }
 
     public void setProxyHost(String proxyHost) {
@@ -114,8 +137,14 @@ public class GoogleProcessor extends Thread {
         this.proxyPort = proxyPort;
     }
 
-    public void setProxyUsername(String proxyUsername) {
-        this.proxyUsername = "customer-"+proxyUsername+"-cc-us-sessid-"+proxyProvider.getRandomSessionId()+"-sesstime-10";
+    public void setProxyUsername(String proxyUsername, String brand) {
+        switch (brand) {
+            case "oxy":
+                this.proxyUsername = "customer-"+proxyUsername+"-cc-us-sessid-"+proxyProvider.getRandomSessionId()+"-sesstime-10";
+                break;
+            case "dataimpulse":
+                this.proxyUsername = proxyUsername + "__cr.us";
+        }
     }
 
     public void setProxyPassword(String proxyPassword) {
