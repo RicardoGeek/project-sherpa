@@ -7,8 +7,7 @@ import runners.TouchProcessor;
 import java.sql.SQLException;
 
 public class Worker {
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        initializeFlyway();
+    public static void main(String[] args) {
         String type = args[0];
         System.out.println(type);
         switch (type) {
@@ -19,6 +18,9 @@ public class Worker {
                 break;
             case "2":
                 GoogleProcessor.spawn();
+                break;
+            case "99":
+                initializeFlyway();
                 break;
             default:
                 System.out.println("wtf parameter");
