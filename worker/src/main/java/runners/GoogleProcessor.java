@@ -68,31 +68,13 @@ public class GoogleProcessor extends Thread {
             ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
 
             String prevUrl = driver.getCurrentUrl();
-
             locateIframesAndClick(driver);
-
             String newUrl = driver.getCurrentUrl();
 
             if (!prevUrl.equals(newUrl)) {
                 log.info("sponsored page: " + driver.getCurrentUrl());
+                // TODO: register target page
                 pageEngage(driver);
-            } else {
-                prevUrl = driver.getCurrentUrl();
-                log.info("Did not hit sponsored page: " + prevUrl);
-
-                locateIframesAndClick(driver);
-
-                newUrl = driver.getCurrentUrl();
-
-                if(prevUrl.equals(newUrl)) {
-                    pageEngage(driver);
-                    locateIframesAndClick(driver); // try one last time on some other page
-                    log.info("last resort page: " + driver.getCurrentUrl());
-                    pageEngage(driver); // engage with sponsored page (hopefully)
-                } else {
-                    log.info("sponsored page: " + driver.getCurrentUrl());
-                    pageEngage(driver); // engage with sponsored page (hopefully)
-                }
             }
 
             driver.quit();
@@ -200,17 +182,33 @@ public class GoogleProcessor extends Thread {
 
     private void scanLinksAndClickFirst(WebDriver driver) throws InterruptedException {
         List<WebElement> links = driver.findElements(By.tagName("a"));
+        log.info("FOUND " + links.size() + " FUCKING LINKS IN THE FUCKING IFRAME");
         for (WebElement link : links) {
             String href = link.getAttribute("href");
             if (href == null || href.isEmpty() || href.equals("#")) continue;
 
-            int clickDelay = Utils.getRandomNumber(100, 150);
+            int clickDelay = Utils.getRandomNumber(1000, 1500);
             Thread.sleep(clickDelay);
 
+            String current = driver.getCurrentUrl();
             log.info("Clicking link: " + href);
+            if(!link.isDisplayed() || !link.isEnabled()) {
+                log.info("stoopid link not interactable... maybe?");
+                continue;
+            }
+
             link.click();
-            Thread.sleep(3000);
-            break;
+
+            int maxTries = 5;
+            while (current.equals(driver.getCurrentUrl())) {
+                if(maxTries<=0) break;
+                //FUCKING NAVIGATE GOD DAMNIT
+                Thread.sleep(1000);
+                log.info("WAITING FOR FUCKING NAVIGATION");
+                maxTries--;
+            }
+
+            if(!current.equals(driver.getCurrentUrl())) break;
         }
     }
 
