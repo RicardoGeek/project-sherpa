@@ -10,6 +10,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import providers.BrowserProvider;
 import providers.ProxyProvider;
+import providers.RegionProvider;
 import simulation.Simulator;
 import utils.Utils;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class GoogleProcessor extends Thread {
     private final BrowserProvider browserProvider;
     private final ProxyProvider proxyProvider;
+    private final RegionProvider regionProvider;
     private final Simulator simulator;
 
     // proxy configs for process
@@ -37,6 +39,7 @@ public class GoogleProcessor extends Thread {
     public GoogleProcessor() {
         browserProvider = new BrowserProvider();
         proxyProvider = new ProxyProvider();
+        regionProvider = new RegionProvider();
         simulator = new Simulator();
     }
 
@@ -84,10 +87,16 @@ public class GoogleProcessor extends Thread {
             String reason = ex.getMessage().split("\n")[0];
             log.info(reason);
 
-            driver.quit();
-            proxy.stop();
+            boolean isOnSponsored = false;
+            if(driver != null && proxy != null) {
+                isOnSponsored = driver.getCurrentUrl().contains(this.targetPage);
+                driver.quit();
+                proxy.stop();
+            }
 
-            spawn();
+            if(!isOnSponsored) {
+                spawn();
+            }
         }
     }
 
@@ -100,7 +109,7 @@ public class GoogleProcessor extends Thread {
         ProxyDetails pd = pdd.getBest();
 
         GoogleProcessor googleProcessor = new GoogleProcessor();
-        googleProcessor.setHeadless(true);
+        googleProcessor.setHeadless(false);
         googleProcessor.setProxyHost(pd.getHost());
         googleProcessor.setProxyPort(pd.getPort());
         googleProcessor.setProxyUsername(pd.getUsername(), pd.getProvider());
@@ -122,11 +131,12 @@ public class GoogleProcessor extends Thread {
     public void setProxyUsername(String proxyUsername, String brand) {
         switch (brand) {
             case "oxy":
-                this.proxyUsername = "customer-"+proxyUsername+"-cc-us-sessid-"+proxyProvider.getRandomSessionId()+"-sesstime-10";
+                this.proxyUsername = regionProvider.getRandomEndpoint("us", "ricardogeek")+"-sessid-"+proxyProvider.getRandomSessionId()+"-sesstime-10";
                 break;
             case "dataimpulse":
                 this.proxyUsername = proxyUsername + "__cr.us";
         }
+        log.info(this.proxyUsername);
     }
 
     public void setProxyPassword(String proxyPassword) {
@@ -192,7 +202,10 @@ public class GoogleProcessor extends Thread {
 
             String current = driver.getCurrentUrl();
             log.info("Clicking link: " + href);
-            if(!link.isDisplayed() || !link.isEnabled()) {
+            int w = link.getSize().getWidth();
+            int h = link.getSize().getHeight();
+            int t = w + h;
+            if(!link.isDisplayed() || !link.isEnabled() || t <= 0) {
                 log.info("stoopid link not interactable... maybe?");
                 continue;
             }
