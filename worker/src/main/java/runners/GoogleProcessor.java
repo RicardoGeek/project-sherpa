@@ -87,11 +87,12 @@ public class GoogleProcessor extends Thread {
             String reason = ex.getMessage().split("\n")[0];
             log.info(reason);
 
+            if(proxy != null) proxy.stop();
+
             boolean isOnSponsored = false;
-            if(driver != null && proxy != null) {
+            if(driver != null) {
                 isOnSponsored = driver.getCurrentUrl().contains(this.targetPage);
                 driver.quit();
-                proxy.stop();
             }
 
             if(!isOnSponsored) {
