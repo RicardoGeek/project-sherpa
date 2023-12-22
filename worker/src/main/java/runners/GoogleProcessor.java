@@ -14,7 +14,6 @@ import providers.RegionProvider;
 import simulation.Simulator;
 import utils.Utils;
 
-import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
 
@@ -60,13 +59,20 @@ public class GoogleProcessor extends Thread {
             log.info("---------STEP 1: SEARCHING GOOGLE---------");
             driver.get("https://google.com");
             sendTextWithSimulator(driver, "q", this.searchTerm, true);
+
             while (!driver.getTitle().contains(this.searchTerm)) {
                 Thread.sleep(100);
             }
+
             scanLinksAndClick(driver, this.targetPage);
 
             waitComplete(driver);
             log.info("Target page loaded");
+
+            log.info("breathing slowly for 10 seconds");
+            Thread.sleep(10000);
+            log.info("ok finished breathing");
+
             log.info("---------STEP 2: LOCATE IFRAME AND CLICK---------");
             ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
 
@@ -110,7 +116,7 @@ public class GoogleProcessor extends Thread {
         ProxyDetails pd = pdd.getBest();
 
         GoogleProcessor googleProcessor = new GoogleProcessor();
-        googleProcessor.setHeadless(false);
+        googleProcessor.setHeadless(true);
         googleProcessor.setProxyHost(pd.getHost());
         googleProcessor.setProxyPort(pd.getPort());
         googleProcessor.setProxyUsername(pd.getUsername(), pd.getProvider());
