@@ -28,6 +28,7 @@ public class BrowserProvider {
             chromeOptions.addArguments("--no-sandbox");
             chromeOptions.addArguments("--headless");
             chromeOptions.addArguments("--disable-gpu");
+            chromeOptions.addArguments("start-maximized");
         }
 
         chromeOptions.setAcceptInsecureCerts(true);
