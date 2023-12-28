@@ -15,7 +15,7 @@ public class ProxyDetailsDao {
 
     public ProxyDetails getBest() {
         try {
-            List<ProxyDetails> proxies = dbAccess.executeProxySelect("SELECT * FROM proxies WHERE quality = 'BEST'");
+            List<ProxyDetails> proxies = dbAccess.executeProxySelect("SELECT * FROM proxies WHERE quality = 'SECONDARY'");
 
             return proxies.get(0);
         } catch (SQLException | ClassNotFoundException ex) {

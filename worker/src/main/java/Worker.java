@@ -2,6 +2,7 @@ import config.FlywayConfig;
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import runners.GoogleProcessor;
+import runners.SponsoredLinkProcessor;
 import runners.TouchProcessor;
 
 import java.sql.SQLException;
@@ -18,6 +19,9 @@ public class Worker {
                 break;
             case "2":
                 GoogleProcessor.spawn();
+                break;
+            case "3":
+                SponsoredLinkProcessor.spawn();
                 break;
             case "99":
                 initializeFlyway();

@@ -19,6 +19,7 @@ public class BrowserProvider {
 
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
         chromeOptions.addArguments("--user-agent="+userAgent);
+        chromeOptions.addArguments("--sec-ch-ua-platform=iOS");
 
         if(headless) {
             chromeOptions.addArguments("--display=:99");
